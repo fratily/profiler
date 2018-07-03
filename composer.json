@@ -1,0 +1,24 @@
+{
+    "name": "fratily/profiler",
+    "type": "library",
+    "keywords": ["fratily", "profiler", "debug"],
+    "authors": [
+        {
+            "name": "Kento Oka",
+            "email": "kento-oka@kentoka.com"
+        }
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^7.1",
+        "twig/twig": "^2.0",
+        "psr/cache": "^1.0",
+        "psr/http-message": "^1.0",
+        "http-interop/http-factory": "^0.3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Fratily\\Profiler\\": "src/"
+        }
+    }
+}
