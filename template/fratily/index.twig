@@ -1,0 +1,14 @@
+{% extends "fratily/layout/base.twig" %}
+
+{% block pagetitle %}{{ panel.title }} | {{ profile.title }}{% endblock %}
+
+{% block title %}{{ profile.title }}{% endblock %}
+
+{% for block in panel %}
+    <section>
+        {% if block.title is not null %}
+        <h2>{{ block.title }}</h2>
+        {% endif %}
+        {{ include block.template with {"block": block, "profile": profile} only }}
+    </section>
+{% endfor %}

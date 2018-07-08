@@ -31,4 +31,11 @@ interface BlockInterface{
      * @return  Template
      */
     public function getTemplate();
+
+    /**
+     * テンプレートエンジンに追加するインクルードディレクトリのリストを取得する
+     *
+     * @return  string[]
+     */
+    public function getIncludes();
 }

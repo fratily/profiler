@@ -31,7 +31,23 @@ class Profiler{
      * @var \Twig\Environment
      */
     private $twig;
-    
+
+    private static function generateTwig(Panel\PanelInterface $panel){
+        $include    = [__DIR__ . "/../template"];
+
+        foreach($panel->getBlocks() as $block){
+
+        }
+
+        $this->twig = new \Twig\Environment(
+            new \Twig\Loader\FilesystemLoader($include),
+            [
+                "cache" => $cache,
+                "debug" => true,
+            ]
+        );
+    }
+
     public function __construct(CacheInterface $cache){
         $this->cache    = $cache;
     }
@@ -57,33 +73,13 @@ class Profiler{
             self::CACHE_PREFIX  . "." . $profile->getToken(),
             $profile
         );
+
+        return $this;
     }
 
     public function getResponse(string $token, string $name, string $cache = false){
         $profile    = $this->getProfile($token);
         $panel      = $profile->getPanel($name);
-
-        if($this->twig === null){
-            $include    = array_merge(
-                [__DIR__ . "/../template"],
-                array_unique(
-                    array_filter(
-                        array_map(
-                            function($panel){return $panel->getInclude();},
-                            $panels
-                        ),
-                        "is_string"
-                    )
-                )
-            );
-
-            $this->twig = new \Twig\Environment(
-                new \Twig\Loader\FilesystemLoader($include),
-                [
-                    "cache" => $cache,
-                    "debug" => true,
-                ]
-            );
-        }
+        $twig       = self::generateTwig($panel);
     }
 }

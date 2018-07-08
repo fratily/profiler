@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<head>
+    <title>{% block pagetitle %}Fratily Profiler{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <div class="wrapper">
+            <h1>{% block title %}Fratily Profiler{% endblock %}</h1>
+        </div>
+    </header>
+    <menu>
+        <ul>
+            {% block menu %}{% endblock %}
+        </ul>
+    </menu>
+    <main>
+        <div class="wrapper">
+            {% block panel %}{% endblock %}
+        </div>
+    </main>
+</body>

@@ -18,6 +18,9 @@ namespace Fratily\Profiler\Panel;
  */
 interface PanelInterface{
 
+    /**
+     * パネルタイトルを取得する
+     */
     public function getTitle();
 
     public function getBlocks();
