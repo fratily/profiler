@@ -23,63 +23,116 @@ class Profiler{
     const CACHE_PREFIX  = "fratily.profiler.profile";
 
     /**
-     * @var CacheInterface
+     * @var CacheInterface|null
      */
     private $cache;
 
     /**
-     * @var \Twig\Environment
+     * プロファイルトークンを生成する
+     *
+     * @return  string
      */
-    private $twig;
-
-    private static function generateTwig(Panel\PanelInterface $panel){
-        $include    = [__DIR__ . "/../template"];
-
-        foreach($panel->getBlocks() as $block){
-
-        }
-
-        $this->twig = new \Twig\Environment(
-            new \Twig\Loader\FilesystemLoader($include),
-            [
-                "cache" => $cache,
-                "debug" => true,
-            ]
+    public static function generateToken(){
+        return substr(
+            md5((string)time() . bin2hex(random_bytes(4))),
+            0,
+            8
         );
     }
 
-    public function __construct(CacheInterface $cache){
+    /**
+     * トークンに対応したキャッシュキーを取得する
+     *
+     * @param   string  $token
+     *  プロファイルトークン
+     *
+     * @return  string
+     */
+    protected static function getCacheKey(string $token){
+        return static::CACHE_PREFIX. "." . $token;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param   CacheInterface  $cache
+     *  プロファイルをキャッシュするためのキャッシュマネージャ
+     */
+    public function __construct(CacheInterface $cache = null){
         $this->cache    = $cache;
     }
 
+    /**
+     * 指定したトークンのプロファイルをキャッシュから取得する
+     *
+     * @param   string  $token
+     *
+     * @return  Profile
+     */
     public function getProfile(string $token){
-        $key    = self::CACHE_PREFIX . "." . $token;
-
-        if(!$this->cache->has($key)){
-            return new Profile($panels);
+        if(!$this->hasProfile($token)){
+            throw new Exception\CacheNotFoundException(
+                "Cache corresponding to token '{$token}' was not found."
+            );
         }
 
-        $profile    = $this->cache->get($key);
+        $profile    = $this->cache->get(static::getCacheKey($token));
 
         if(!$profile instanceof Profile){
-            throw new \LogicException;
+            $key    = static::getCacheKey($token);
+            $class  = Profile::class;
+
+            throw new Exception\InvalidCacheValueException(
+                "The value of the cache key '{$key}' (token:{$token}) was not a"
+                . " {$class}."
+            );
         }
 
         return $profile;
     }
 
+    /**
+     * 指定したトークンのプロファイルをキャッシュに保持しているか確認する
+     *
+     * @param   string  $token
+     *  プロファイルトークン
+     *
+     * @return  bool
+     */
+    public function hasProfile(string $token){
+        return $this->cache->has(static::getCacheKey($token));
+    }
+
+    /**
+     * プロファイルをキャッシュに追加する
+     *
+     * @param   Profile $profile
+     *  プロファイル
+     *
+     * @return  $this
+     */
     public function addProfile(Profile $profile){
         $this->cache->set(
-            self::CACHE_PREFIX  . "." . $profile->getToken(),
+            static::getCacheKey($profile->getToken()),
             $profile
         );
 
         return $this;
     }
 
-    public function getResponse(string $token, string $name, string $cache = false){
-        $profile    = $this->getProfile($token);
-        $panel      = $profile->getPanel($name);
-        $twig       = self::generateTwig($panel);
+    /**
+     * 指定したトークンのプロファイルをキャッシュから削除する
+     *
+     * @param   string  $token
+     *  プロファイルトークン
+     *
+     * @return  $this
+     */
+    public function removeProfile(string $token){
+        if($this->hasProfile($token)){
+            $this->cache->delete(static::getCacheKey($token));
+        }
+
+        return $this;
     }
 }

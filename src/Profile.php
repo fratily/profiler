@@ -29,17 +29,6 @@ class Profile{
     private $panels = [];
 
     /**
-     * トークンを生成する
-     *
-     * @return  string
-     *  一意性のある文字列。同一のトークンが既に使用されていた場合は、
-     *  過去のデータが上書きされる可能性があることに注意。
-     */
-    protected static function generateToken(){
-        return substr(md5(microtime() . random_int(0, 1000)), 0, 10);
-    }
-
-    /**
      * Constructor
      */
     public function __construct(){
@@ -56,19 +45,7 @@ class Profile{
     }
 
     /**
-     * パネルを取得する
-     *
-     * @param   string  $name
-     *  パネルの名前
-     *
-     * @return  Panle\PanelInterface|null
-     */
-    public function getPanel(string $name){
-        return $this->panels[$name] ?? null;
-    }
-
-    /**
-     *
+     * プロファイルに登録されている名前をキーとしたパネルの連想配列を取得する
      *
      * @return  Panel\PanelInterface[]
      */
@@ -77,29 +54,71 @@ class Profile{
     }
 
     /**
-     * パネルを追加する
+     * パネルを取得する
      *
      * @param   string  $name
-     *  パネルの名前
-     * @param   Panel\PanelInterface    $panel
-     *  パネルインスタンス
+     *  パネル名
      *
-     * @return  $this
+     * @return  Panle\PanelInterface
      *
-     * @throws  \InvalidArgumentException
+     * @throws  Exception\PanelNotFoundException
      */
-    public function addPanel(string $name, Panel\PanelInterface $panel){
-        $name   = trim($name);
-
-        if($name === ""){
-            throw new \InvalidArgumentException();
+    public function getPanel(string $name){
+        if(!$this->hasPanel($name)){
+            throw new Exception\PanelNotFoundException(
+                ""
+            );
         }
 
-        if(array_key_exists($name, $this->panels)){
-            throw new \InvalidArgumentException();
+        return $this->panels[$name];
+    }
+
+    /**
+     * 指定した名前のパネルが存在するか確認する
+     *
+     * @param   string  $name
+     *  パネル名
+     *
+     * @return  bool
+     */
+    public function hasPanel(string $name){
+        return array_key_exists($name, $this->panels);
+    }
+
+    /**
+     * パネルを追加する
+     *
+     * @param   Panel\PanelInterface    $panel
+     *  パネルのインスタンス
+     *
+     * @return  $this
+     */
+    public function addPanel(Panel\PanelInterface $panel){
+        $name   = $panel->getName();
+        
+        if($this->hasPanel($name)){
+            throw new \InvalidArgumentException(
+                ""
+            );
         }
 
         $this->panels[$name]    = $panel;
+
+        return $this;
+    }
+
+    /**
+     * パネルを削除する
+     *
+     * @param   string  $name
+     *  パネル名
+     *
+     * @return $this
+     */
+    public function removePanel(string $name){
+        if($this->hasPanel($name)){
+            unset($this->panels[$name]);
+        }
 
         return $this;
     }

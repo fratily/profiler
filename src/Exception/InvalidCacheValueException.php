@@ -11,11 +11,10 @@
  * @license     MIT
  * @since       1.0.0
  */
-namespace Fratily\Profiler;
+namespace Fratily\Profiler\Exception;
 
 /**
  *
  */
-class ToolBar{
-
+class InvalidCacheValueException extends \RuntimeException{
 }

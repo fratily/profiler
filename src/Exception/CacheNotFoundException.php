@@ -11,21 +11,10 @@
  * @license     MIT
  * @since       1.0.0
  */
-namespace Fratily\Profiler\Panel;
+namespace Fratily\Profiler\Exception;
 
 /**
  *
  */
-interface PanelInterface{
-
-    /**
-     * パネルタイトルを取得する
-     */
-    public function getTitle();
-
-    public function getName();
-
-    public function getTemplate();
-
-    public function getCollector();
+class CacheNotFoundException extends \LogicException{
 }
